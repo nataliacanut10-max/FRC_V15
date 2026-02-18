@@ -15,7 +15,7 @@ public class MoveBox extends Command {
     public MoveBox(BoxSubsystem box, double setpoint) {
         this.box = box;
         this.setpoint = setpoint;
-        pid = new PIDController(0.1, 0.0, 0.0);
+        pid = new PIDController(0.03, 0.0, 0.0);
         pid.setTolerance(tolerance);
 
         addRequirements(box);
@@ -28,12 +28,17 @@ public class MoveBox extends Command {
 
         double speedR = pid.calculate(rightV, setpoint);
         double speedL = pid.calculate(leftV, setpoint);
-        speedR = MathUtil.clamp(speedR, -0.5, .5);
+        speedR = MathUtil.clamp(speedR, -0.15, 0.15);
         box.setSpeed(speedR, speedL);
     }
 
     @Override
     public void end(boolean interrupted) {
         box.setSpeed(0.0, 0.0);
+    }
+
+    @Override
+    public boolean isFinished() {
+        return pid.atSetpoint();
     }
 }

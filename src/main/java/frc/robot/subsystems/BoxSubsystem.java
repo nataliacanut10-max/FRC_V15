@@ -49,8 +49,8 @@ public class BoxSubsystem extends SubsystemBase {
     }
 
     public void setSpeed(double right, double left) {
-        MotorLeft.set(left);
-        MotorRight.set(-right);
+        MotorLeft.set(-left);
+        MotorRight.set(right);
     }
 
     public void resetBox(){

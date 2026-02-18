@@ -4,6 +4,8 @@
 
 package frc.robot;
 
+import edu.wpi.first.math.util.Units;
+
 /**
  * The Constants class provides a convenient place for teams to hold robot-wide
  * numerical or boolean constants. This class should not be used for any other
@@ -26,7 +28,7 @@ public final class Constants {
     // likelihood of tripping breakers or damaging CIM motors
     public static final int DRIVE_MOTOR_CURRENT_LIMIT = 60;
     public static final double MAX_SPEED = 1;
-    public static final double SLOW_SPEED = 0.3;
+    public static final double SLOW_SPEED = 0.2;
 
     public static final double kP = 0.0;
     public static final double kI = 0.0;
@@ -36,10 +38,11 @@ public final class Constants {
     public static final double kV = 12.5; // Voltagem Maxima / Velocidade Maxima em m/S
     public static final double kA = 0.35;
 
+    public static final double distancePerRevoltionInMeter = Math.PI * Units.inchesToMeters(3) * 2;
+
   }
 
   public static final class FuelConstants {
-
 
     public static final int ShooterID = 3;
     public static final int IntakeID = 3;
@@ -52,8 +55,6 @@ public final class Constants {
     public static final double IntakeSpeedUP = 0.4;
     public static final double ShooterSpeed = -0.8;
     public static final double ShooterSpeedUP = -0.6;
-    public static final double LongShootSpeed = -0.8;
-    public static final double BoxSpeed = 0.1;
 
     // Current limit and nominal voltage for fuel mechanism motors.
     public static final int FEEDER_MOTOR_CURRENT_LIMIT = 60;
@@ -85,7 +86,7 @@ public final class Constants {
   public static final class BoxConstants {
 
     public static final double extendedSet = 17;
-    public static final double retractSet = 2;
+    public static final double retractSet = 0.3;
 
   }
 

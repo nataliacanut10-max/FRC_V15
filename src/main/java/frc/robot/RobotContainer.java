@@ -7,11 +7,11 @@ package frc.robot;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
+import frc.robot.commands.DriveWithMeters;
 import frc.robot.commands.MoveBox;
 import frc.robot.commands.Shoot;
-import frc.robot.commands.SooterTesete;
+import frc.robot.commands.ShooterTeste;
 import frc.robot.commands.TankDriveCommand;
-import frc.robot.commands.Test;
 import frc.robot.subsystems.BoxSubsystem;
 import frc.robot.subsystems.CANDriveSubsystem;
 import frc.robot.subsystems.ClimberSubsystem;
@@ -51,8 +51,6 @@ public class RobotContainer {
 
     climberSubsystem = new ClimberSubsystem();
 
-    // Comandos
-
     configureBindings();
 
     // m_autoChooser.setDefaultOption("1 - [AUTO C]", new
@@ -80,37 +78,30 @@ public class RobotContainer {
         .whileTrue(Commands.startEnd(() -> shooterAndIntake.intakeOn(), () -> shooterAndIntake.intakeOff()));
 
     // ShortShoot
-    // m_controller2.x().whileTrue(new Shoot(shooterAndIntake, 5000));
-
-    // m_controller2.x().whileTrue(new Test(shooterAndIntake));
-
-    // LongShoot
-    // m_controller2.b().toggleOnTrue(new
-    // SequentialCommandGroup(shooterAndIntake.longshooterOn()))
-    // .toggleOnFalse(Commands.runOnce(() -> shooterAndIntake.shooterOff()));
+    m_controller2.x().whileTrue(new Shoot(shooterAndIntake, 3500));
 
     // MoveBox
-    // m_controller2.rightBumper().toggleOnTrue(new MoveBox(boxSubsystem,
-    //     Constants.BoxConstants.extendedSet))
-    //     .toggleOnFalse(new MoveBox(boxSubsystem, Constants.BoxConstants.retractSet));
-    m_controller2.rightBumper()
-    .whileTrue(Commands.startEnd(() -> boxSubsystem.setSpeed(0.15, 0.15), () ->
-    boxSubsystem.setSpeed(0, 0)));
+    m_controller2.rightBumper().whileTrue(new MoveBox(boxSubsystem,
+        Constants.BoxConstants.extendedSet));
+    m_controller2.leftBumper().whileTrue(new MoveBox(boxSubsystem,
+        Constants.BoxConstants.retractSet));
+    m_controller2.b().and(m_controller2.y()).onTrue(Commands.runOnce(() -> boxSubsystem.resetBox()));
 
-    m_controller2.leftBumper()
-    .whileTrue(Commands.startEnd(() -> boxSubsystem.setSpeed(-0.15, -0.15), () ->
-    boxSubsystem.setSpeed(0, 0)));
+    m_controller.b().whileTrue(new DriveWithMeters(driveSubsystem, 1));
+    m_controller.x().whileTrue(new DriveWithMeters(driveSubsystem, 0));
+    m_controller.a().and(m_controller.y()).onTrue(Commands.runOnce(() -> driveSubsystem.resetEncoders()));
 
-    m_controller.y()
-        .whileTrue(Commands.startEnd(() -> climberSubsystem.climbOn(0.5), () -> climberSubsystem.climbOn(0)));
+    // climberSubsystem.climbOn(0)));
 
-    m_controller.a()
-        .whileTrue(Commands.startEnd(() -> climberSubsystem.climbOn(-0.5), () -> climberSubsystem.climbOn(0)));
+    // m_controller.y()
+    // .whileTrue(Commands.startEnd(() -> climberSubsystem.climbOn(-0.5), () ->
+    // climberSubsystem.climbOn(0)));
 
-    m_controller2.x().whileTrue(new SooterTesete(shooterAndIntake)).whileFalse(Commands.runOnce(() -> {
-      shooterAndIntake.stopFlywheel();
-      shooterAndIntake.stopIndexer();
-    }));
+    // m_controller2.x().whileTrue(new
+    // ShooterTeste(shooterAndIntake)).whileFalse(Commands.runOnce(() -> {
+    // shooterAndIntake.stopFlywheel();
+    // shooterAndIntake.stopIndexer();
+    // }));
   }
 
   public Command getAutonomousCommand() {

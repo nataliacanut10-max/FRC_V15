@@ -6,19 +6,26 @@ package frc.robot.commands;
 
 import java.util.function.DoubleSupplier;
 
+import edu.wpi.first.math.controller.PIDController;
 import edu.wpi.first.wpilibj2.command.Command;
 import frc.robot.subsystems.CANDriveSubsystem;
 
-public class TankDriveCommand extends Command {
+public class TankDriveWithPID extends Command {
   private final CANDriveSubsystem CANDriveSubsystem;
   private DoubleSupplier x, y;
   private double speed;
 
-  public TankDriveCommand(CANDriveSubsystem CANDriveSubsystem, DoubleSupplier x, DoubleSupplier y, double speed) {
+  private PIDController pidLeft, pidRight;
+
+  public TankDriveWithPID(CANDriveSubsystem CANDriveSubsystem, DoubleSupplier x, DoubleSupplier y, double speed) {
     this.CANDriveSubsystem = CANDriveSubsystem;
     this.x = x;
     this.y = y;
     this.speed = speed;
+    pidLeft = new PIDController(1, 0.0, 0.0);
+
+    pidRight = new PIDController(1, 0.0, 0.0);
+
     addRequirements(CANDriveSubsystem);
   }
 

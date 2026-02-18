@@ -6,16 +6,16 @@ import edu.wpi.first.wpilibj2.command.Command;
 import frc.robot.subsystems.ShooterAndIntakeSubsystem;
 
 public class Shoot extends Command {
-     private final ShooterAndIntakeSubsystem subsystem;
+    private final ShooterAndIntakeSubsystem subsystem;
     private final double desiredRPM;
 
     // Feedforward in VOLTS. Units depend on the velocity unit you feed in.
     // Here we use RPS (rotations/second), because TalonFX velocity setpoint is RPS.
     // Tune these with SysId (recommended) or empirically.
     private final SimpleMotorFeedforward ff = new SimpleMotorFeedforward(
-            0.4,  // kS (volts)
-            0.0,  // kV (volts per RPS)  <-- placeholder
-            0.03  // kA (volts per RPS/s) <-- placeholder
+            0.3, // kS (volts)
+            0.1123, // kV (volts per RPS) <-- placeholder
+            0.0 // kA (volts per RPS/s) <-- placeholder
     );
 
     private static final double INDEXER_POWER = 1.0;

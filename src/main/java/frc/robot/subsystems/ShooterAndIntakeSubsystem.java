@@ -8,7 +8,6 @@ import com.ctre.phoenix6.controls.VelocityVoltage;
 import com.ctre.phoenix6.controls.VoltageOut;
 import com.ctre.phoenix6.hardware.TalonFX;
 
-import edu.wpi.first.math.util.Units;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import com.ctre.phoenix.motorcontrol.ControlMode;
@@ -37,7 +36,7 @@ public class ShooterAndIntakeSubsystem extends SubsystemBase {
         // Configure TalonFX onboard PID gains (Slot0)
         // TODO: tune these values (start small). Ideally use SysId.
         var cfg = new TalonFXConfiguration();
-        cfg.Slot0.kP = 0.0;
+        cfg.Slot0.kP = 0.01;
         cfg.Slot0.kI = 0.0;
         cfg.Slot0.kD = 0.0;
 
@@ -103,5 +102,6 @@ public class ShooterAndIntakeSubsystem extends SubsystemBase {
     public void periodic() {
         SmartDashboard.putNumber("KrakenRPM", getFlyRPM());
         SmartDashboard.putNumber("KrakenRPS", kraken.getVelocity().getValueAsDouble());
+        SmartDashboard.putNumber("Kraken Voltage", kraken.getMotorVoltage().getValueAsDouble());
     }
 }
