@@ -15,7 +15,7 @@ public class DriveWithMeters extends Command {
     public DriveWithMeters(CANDriveSubsystem subsystem, double meters) {
         this.subsystem = subsystem;
         this.meters = meters;
-        pidRight = new PIDController(2, 0, 0.);
+        pidRight = new PIDController(2.5, 0.0, 0.0);
         pidLeft = new PIDController(2, 1, 0.0);
         double tolerance = meters * 0.01;
         // pidRight.setTolerance(tolerance);
@@ -40,7 +40,9 @@ public class DriveWithMeters extends Command {
         leftSpeed = MathUtil.clamp(leftSpeed, -0.2, 0.2);
         rightSpeed = MathUtil.clamp(rightSpeed, -0.2, 0.2);
 
-        subsystem.drive(-leftSpeed, -leftSpeed);
+        //subsystem.drive(-leftSpeed, -leftSpeed);
+
+        subsystem.drive(-leftSpeed, -rightSpeed);
 
         SmartDashboard.putNumber("Error PID", pidRight.getError());
     }

@@ -34,7 +34,7 @@ public final class Constants {
     public static final double kI = 0.0;
     public static final double kD = 0.0;
 
-    public static final double kS = 0.3;
+    public static final double kS = 0.3; // Voltagem para vencer o atrito
     public static final double kV = 12.5; // Voltagem Maxima / Velocidade Maxima em m/S
     public static final double kA = 0.35;
 

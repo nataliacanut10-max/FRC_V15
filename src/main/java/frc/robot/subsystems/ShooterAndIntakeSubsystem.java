@@ -69,8 +69,8 @@ public class ShooterAndIntakeSubsystem extends SubsystemBase {
                         .withFeedForward(ffVolts));
     }
 
-    public void set() {
-        kraken.set(0.6);
+    public void set(double krakenSpeed) {
+        kraken.set(krakenSpeed);
     }
 
     /** Convenience overload: no feedforward. */

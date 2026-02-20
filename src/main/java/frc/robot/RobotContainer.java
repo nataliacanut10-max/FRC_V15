@@ -4,18 +4,21 @@
 
 package frc.robot;
 
+import edu.wpi.first.wpilibj.smartdashboard.SendableChooser;
+import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
 import frc.robot.commands.DriveWithMeters;
 import frc.robot.commands.MoveBox;
 import frc.robot.commands.Shoot;
-import frc.robot.commands.ShooterTeste;
 import frc.robot.commands.TankDriveCommand;
+import frc.robot.commands.Autonomus.Comandos.AutoCentral;
 import frc.robot.subsystems.BoxSubsystem;
 import frc.robot.subsystems.CANDriveSubsystem;
 import frc.robot.subsystems.ClimberSubsystem;
 import frc.robot.subsystems.ShooterAndIntakeSubsystem;
+
 
 /**
  * This class is where the bulk of the robot should be declared. Since
@@ -30,6 +33,8 @@ public class RobotContainer {
   private final ShooterAndIntakeSubsystem shooterAndIntake;
   private final BoxSubsystem boxSubsystem;
   private final ClimberSubsystem climberSubsystem;
+
+  private final SendableChooser<Command> m_chooser = new SendableChooser<>();
 
   private final CommandXboxController m_controller = new CommandXboxController(0);
   private final CommandXboxController m_controller2 = new CommandXboxController(1);
@@ -51,6 +56,9 @@ public class RobotContainer {
 
     climberSubsystem = new ClimberSubsystem();
 
+    m_chooser.setDefaultOption("Auto Centro", new AutoCentral(driveSubsystem, shooterAndIntake));
+    SmartDashboard.putData("Auto Centro", m_chooser);
+
     configureBindings();
 
     // m_autoChooser.setDefaultOption("1 - [AUTO C]", new
@@ -63,15 +71,16 @@ public class RobotContainer {
   }
 
   private void configureBindings() {
+
+    // Movimentação
     driveSubsystem.setDefaultCommand(new TankDriveCommand(driveSubsystem, () -> m_controller.getLeftY(),
         () -> m_controller.getRightX(), Constants.DriveConstants.MAX_SPEED));
 
-    // m_controller.rightTrigger()
-    // .whileTrue(Commands.runOnce(() -> driveSubsystem.calculateWithMPS(1200,
-    // 1200)));
-
     m_controller.leftTrigger().toggleOnTrue(new TankDriveCommand(driveSubsystem, () -> m_controller.getLeftY(),
         () -> m_controller.getRightX(), Constants.DriveConstants.SLOW_SPEED));
+
+    m_controller.leftTrigger().toggleOnFalse(new TankDriveCommand(driveSubsystem, () -> m_controller.getLeftY(),
+        () -> m_controller.getRightX(), Constants.DriveConstants.MAX_SPEED));
 
     // Collect
     m_controller2.a()
@@ -80,6 +89,7 @@ public class RobotContainer {
     // ShortShoot
     m_controller2.x().whileTrue(new Shoot(shooterAndIntake, 3500));
 
+    
     // MoveBox
     m_controller2.rightBumper().whileTrue(new MoveBox(boxSubsystem,
         Constants.BoxConstants.extendedSet));
@@ -91,21 +101,32 @@ public class RobotContainer {
     m_controller.x().whileTrue(new DriveWithMeters(driveSubsystem, 0));
     m_controller.a().and(m_controller.y()).onTrue(Commands.runOnce(() -> driveSubsystem.resetEncoders()));
 
-    // climberSubsystem.climbOn(0)));
+    //Climber
 
-    // m_controller.y()
-    // .whileTrue(Commands.startEnd(() -> climberSubsystem.climbOn(-0.5), () ->
-    // climberSubsystem.climbOn(0)));
+     m_controller.y()
+     .whileTrue(Commands.startEnd(() -> climberSubsystem.climbOn(-0.5), () ->
+     climberSubsystem.climbOn(0)));
 
+     m_controller.a()
+     .whileTrue(Commands.startEnd(() -> climberSubsystem.climbOn(0.5), () ->
+     climberSubsystem.climbOn(0)));
+
+    // climberSubsystem.climbOn(0)));
     // m_controller2.x().whileTrue(new
     // ShooterTeste(shooterAndIntake)).whileFalse(Commands.runOnce(() -> {
     // shooterAndIntake.stopFlywheel();
     // shooterAndIntake.stopIndexer();
     // }));
+
+    // m_controller.rightTrigger()
+    // .whileTrue(Commands.runOnce(() -> driveSubsystem.calculateWithMPS(1200,
+    // 1200)));
+  
   }
 
   public Command getAutonomousCommand() {
-    return new MoveBox(boxSubsystem, Constants.BoxConstants.extendedSet);
-    // return m_autoChooser.getSelected();
+    return m_chooser.getSelected();
+
+    //return new MoveBox(boxSubsystem, Constants.BoxConstants.extendedSet);
   }
 }
