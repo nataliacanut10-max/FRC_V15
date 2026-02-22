@@ -17,15 +17,6 @@ public class BoxSubsystem extends SubsystemBase {
     private RelativeEncoder EncoderRight = MotorRight.getEncoder();
 
     public BoxSubsystem() {
-        /*
-         * motorConfig.idleMode(IdleMode.kBrake);
-         * 
-         * Motor.configure(
-         * motorConfig,
-         * ResetMode.kResetSafeParameters,
-         * PersistMode.kNoPersistParameters
-         * );
-         */
         EncoderLeft.setPosition(0);
         EncoderRight.setPosition(0);
     }
@@ -53,7 +44,7 @@ public class BoxSubsystem extends SubsystemBase {
         MotorRight.set(right);
     }
 
-    public void resetBox(){
+    public void resetBox() {
         EncoderLeft.setPosition(0);
         EncoderRight.setPosition(0);
     }

@@ -9,16 +9,18 @@ import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
+import frc.robot.commands.AimWithLL;
 import frc.robot.commands.DriveWithMeters;
 import frc.robot.commands.MoveBox;
 import frc.robot.commands.Shoot;
+import frc.robot.commands.ShootHub;
 import frc.robot.commands.TankDriveCommand;
-import frc.robot.commands.Autonomus.Comandos.AutoCentral;
+import frc.robot.commands.Autonomus.AutoCentral;
 import frc.robot.subsystems.BoxSubsystem;
 import frc.robot.subsystems.CANDriveSubsystem;
 import frc.robot.subsystems.ClimberSubsystem;
 import frc.robot.subsystems.ShooterAndIntakeSubsystem;
-
+import frc.robot.subsystems.Vision;
 
 /**
  * This class is where the bulk of the robot should be declared. Since
@@ -33,20 +35,14 @@ public class RobotContainer {
   private final ShooterAndIntakeSubsystem shooterAndIntake;
   private final BoxSubsystem boxSubsystem;
   private final ClimberSubsystem climberSubsystem;
+  private final Vision vision;
 
   private final SendableChooser<Command> m_chooser = new SendableChooser<>();
 
   private final CommandXboxController m_controller = new CommandXboxController(0);
   private final CommandXboxController m_controller2 = new CommandXboxController(1);
 
-  // The autonomous chooser
-  // private final SendableChooser<Command> m_autoChooser;
-
-  /*
-   * The container for the robot. Contains subsystems, OI devices, and commands.
-   */
   public RobotContainer() {
-
     // Subsistemas
     driveSubsystem = new CANDriveSubsystem();
 
@@ -56,40 +52,27 @@ public class RobotContainer {
 
     climberSubsystem = new ClimberSubsystem();
 
-    m_chooser.setDefaultOption("Auto Centro", new AutoCentral(driveSubsystem, shooterAndIntake));
-    SmartDashboard.putData("Auto Centro", m_chooser);
+    vision = new Vision();
 
+    setAutoOptions();
     configureBindings();
-
-    // m_autoChooser.setDefaultOption("1 - [AUTO C]", new
-    // Autocenter(m_shooterSubsystem, m_CanDriveSubsystem));
-    // m_autoChooser.addOption("2 - [AUTO 1]", new AutoLeftOne(m_shooterSubsystem,
-    // dtRight2, dtRight1, dtLeft2, dtLeft1));
-    // m_autoChooser = AutoBuilder.buildAutoChooser();
-    // SmartDashboard.putData("Auto Chooser", m_autoChooser);
-
+    SmartDashboard.putData("Auto Centro", m_chooser);
   }
 
   private void configureBindings() {
-
     // Movimentação
     driveSubsystem.setDefaultCommand(new TankDriveCommand(driveSubsystem, () -> m_controller.getLeftY(),
         () -> m_controller.getRightX(), Constants.DriveConstants.MAX_SPEED));
 
     m_controller.leftTrigger().toggleOnTrue(new TankDriveCommand(driveSubsystem, () -> m_controller.getLeftY(),
         () -> m_controller.getRightX(), Constants.DriveConstants.SLOW_SPEED));
-
-    m_controller.leftTrigger().toggleOnFalse(new TankDriveCommand(driveSubsystem, () -> m_controller.getLeftY(),
-        () -> m_controller.getRightX(), Constants.DriveConstants.MAX_SPEED));
-
     // Collect
     m_controller2.a()
         .whileTrue(Commands.startEnd(() -> shooterAndIntake.intakeOn(), () -> shooterAndIntake.intakeOff()));
 
     // ShortShoot
-    m_controller2.x().whileTrue(new Shoot(shooterAndIntake, 3500));
+    m_controller2.x().whileTrue(new ShootHub(shooterAndIntake, vision, 3500));
 
-    
     // MoveBox
     m_controller2.rightBumper().whileTrue(new MoveBox(boxSubsystem,
         Constants.BoxConstants.extendedSet));
@@ -101,32 +84,21 @@ public class RobotContainer {
     m_controller.x().whileTrue(new DriveWithMeters(driveSubsystem, 0));
     m_controller.a().and(m_controller.y()).onTrue(Commands.runOnce(() -> driveSubsystem.resetEncoders()));
 
-    //Climber
+    // Aim the robot to shoot
+    m_controller.b().whileTrue(new AimWithLL(driveSubsystem, vision));
 
-     m_controller.y()
-     .whileTrue(Commands.startEnd(() -> climberSubsystem.climbOn(-0.5), () ->
-     climberSubsystem.climbOn(0)));
+    // Climber
+    m_controller.y()
+        .whileTrue(Commands.startEnd(() -> climberSubsystem.climbOn(-0.5), () -> climberSubsystem.climbOn(0)));
+    m_controller.a()
+        .whileTrue(Commands.startEnd(() -> climberSubsystem.climbOn(0.5), () -> climberSubsystem.climbOn(0)));
+  }
 
-     m_controller.a()
-     .whileTrue(Commands.startEnd(() -> climberSubsystem.climbOn(0.5), () ->
-     climberSubsystem.climbOn(0)));
-
-    // climberSubsystem.climbOn(0)));
-    // m_controller2.x().whileTrue(new
-    // ShooterTeste(shooterAndIntake)).whileFalse(Commands.runOnce(() -> {
-    // shooterAndIntake.stopFlywheel();
-    // shooterAndIntake.stopIndexer();
-    // }));
-
-    // m_controller.rightTrigger()
-    // .whileTrue(Commands.runOnce(() -> driveSubsystem.calculateWithMPS(1200,
-    // 1200)));
-  
+  public void setAutoOptions() {
+    m_chooser.setDefaultOption("Auto Centro", new AutoCentral(driveSubsystem, shooterAndIntake, vision));
   }
 
   public Command getAutonomousCommand() {
     return m_chooser.getSelected();
-
-    //return new MoveBox(boxSubsystem, Constants.BoxConstants.extendedSet);
   }
 }

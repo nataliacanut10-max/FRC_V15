@@ -6,9 +6,11 @@ import edu.wpi.first.wpilibj2.command.Command;
 import frc.robot.subsystems.ShooterAndIntakeSubsystem;
 import frc.robot.subsystems.Vision;
 
-public class Shoot extends Command {
+public class ShootHub extends Command {
     private final ShooterAndIntakeSubsystem subsystem;
+    private final Vision vision;
     private final double desiredRPM;
+    private boolean readyToShoot = false;
 
     // Feedforward in VOLTS. Units depend on the velocity unit you feed in.
     // Here we use RPS (rotations/second), because TalonFX velocity setpoint is RPS.
@@ -23,9 +25,10 @@ public class Shoot extends Command {
     private static final double RPM_TOLERANCE = 150.0; // start 150~250 and adjust
     private static final double MAX_FF_VOLTS = 12.0;
 
-    public Shoot(ShooterAndIntakeSubsystem subsystem, double desiredRPM) {
+    public ShootHub(ShooterAndIntakeSubsystem subsystem, Vision vision, double desiredRPM) {
         this.subsystem = subsystem;
         this.desiredRPM = desiredRPM;
+        this.vision = vision;
         addRequirements(subsystem);
     }
 
@@ -36,21 +39,24 @@ public class Shoot extends Command {
 
     @Override
     public void execute() {
-        double targetRPS = desiredRPM / 60.0;
-        double ffVolts = ff.calculate(targetRPS);
-        ffVolts = MathUtil.clamp(ffVolts, -MAX_FF_VOLTS, MAX_FF_VOLTS);
+        readyToShoot = vision.readyToShoot();
+        if (readyToShoot) {
+            double targetRPS = desiredRPM / 60.0;
+            double ffVolts = ff.calculate(targetRPS);
+            ffVolts = MathUtil.clamp(ffVolts, -MAX_FF_VOLTS, MAX_FF_VOLTS);
 
-        // Onboard PID (TalonFX Slot0) + FF volts
-        subsystem.setFlywheelVelocityRPM(desiredRPM, ffVolts);
+            // Onboard PID (TalonFX Slot0) + FF volts
+            subsystem.setFlywheelVelocityRPM(desiredRPM, ffVolts);
 
-        // Feed note only when we're within tolerance
-        double currentRPM = subsystem.getFlyRPM();
-        boolean ready = Math.abs(currentRPM - desiredRPM) <= RPM_TOLERANCE;
+            // Feed note only when we're within tolerance
+            double currentRPM = subsystem.getFlyRPM();
+            boolean ready = Math.abs(currentRPM - desiredRPM) <= RPM_TOLERANCE;
 
-        if (ready) {
-            subsystem.setIndexerSpeed(INDEXER_POWER);
-        } else {
-            subsystem.stopIndexer();
+            if (ready) {
+                subsystem.setIndexerSpeed(INDEXER_POWER);
+            } else {
+                subsystem.stopIndexer();
+            }
         }
     }
 

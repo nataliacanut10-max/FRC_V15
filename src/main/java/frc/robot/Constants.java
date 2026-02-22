@@ -90,6 +90,13 @@ public final class Constants {
 
   }
 
+  public static final class CameraConstants {
+    public static final double llAngleMount = 0; // Degrees
+    public static final double llHeight = 0.43; // Meters
+
+    public static final double distanceToShoot = 2.0; // Meters
+  }
+
   public static final class ClimberConstants {
 
     public static final int climberID = 8;

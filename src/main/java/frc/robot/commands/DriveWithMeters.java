@@ -15,6 +15,16 @@ public class DriveWithMeters extends Command {
     public DriveWithMeters(CANDriveSubsystem subsystem, double meters) {
         this.subsystem = subsystem;
         this.meters = meters;
+        /**
+         * ! Nos vamos tentar calibrar o PID de ambos os lados do driveTrain, porém é
+         * ! possível que a gente fique muito tempo tentanto calibrar e ainda sim ele
+         * ! continue andando torto -- A calibração não funcionou
+         */
+        // ? Logo sera necessário fazer uma pequena equação para que o setpoint de
+        // ? cada lado do chassi seja diferente, assim a gente vai tirar essa diferença
+        // ? na mão mandando um lado andar mais ou menos que o outro, não vai ficar
+        // ? perfeito, porém ja deve resolver boa parte dos problemas
+
         pidRight = new PIDController(2.5, 0.0, 0.0);
         pidLeft = new PIDController(2, 1, 0.0);
         double tolerance = meters * 0.01;
@@ -39,8 +49,6 @@ public class DriveWithMeters extends Command {
         double rightSpeed = pidRight.calculate(rightMeters, meters);
         leftSpeed = MathUtil.clamp(leftSpeed, -0.2, 0.2);
         rightSpeed = MathUtil.clamp(rightSpeed, -0.2, 0.2);
-
-        //subsystem.drive(-leftSpeed, -leftSpeed);
 
         subsystem.drive(-leftSpeed, -rightSpeed);
 
